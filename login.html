@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>LOGICRAFT Pilot Login</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="login-page">
+
+  <div class="login-container">
+    <h2>LOGICRAFT Pilot Login</h2>
+
+    <input
+      id="u"
+      type="text"
+      value="admin"
+      placeholder="Username"
+      autocomplete="off"
+    >
+
+    <input
+      id="p"
+      type="password"
+      value="logicraft"
+      placeholder="Password"
+      autocomplete="off"
+    >
+
+    <button onclick="login()">Login</button>
+  </div>
+
+  <script>
+    function login() {
+      const u = document.getElementById("u");
+      const p = document.getElementById("p");
+
+      if (u.value === "admin" && p.value === "logicraft") {
+        sessionStorage.setItem("loggedIn", "true");
+        window.location.href = "dashboard.html";
+      } else {
+        alert("Invalid credentials");
+      }
+    }
+  </script>
+
+</body>
+</html>

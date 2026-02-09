@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>LOGICRAFT – Pilot Data Entry</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body onload="checkAuth(); loadData();">
+
+<script src="nav.js"></script>
+
+<h2>Pilot Data Entry</h2>
+<p style="font-size:13px;color:#555;">
+  Values shown below are the exact values currently used on the dashboard.
+</p>
+
+<!-- ================= LOGISTICS COST ================= -->
+<h3>Logistics Cost (%)</h3>
+<table id="logisticsTable"></table>
+<button onclick="addRow('logisticsTable')">Add Category</button>
+
+<hr>
+
+<!-- ================= SPOILAGE LOSS ================= -->
+<h3>Spoilage Loss (%)</h3>
+<table id="spoilageTable"></table>
+<button onclick="addRow('spoilageTable')">Add Category</button>
+
+<hr>
+
+<!-- ================= DELIVERY TIME ================= -->
+<h3>Delivery Time (Days)</h3>
+<table id="deliveryTable"></table>
+<button onclick="addRow('deliveryTable')">Add Day</button>
+
+<hr>
+
+<!-- ================= COMPARISON TABLE ================= -->
+<h3>Traditional vs LOGICRAFT + ONDC</h3>
+<table id="comparisonTable"></table>
+<button onclick="addComparisonRow()">Add Metric</button>
+
+<br><br>
+<button onclick="saveAll()">Save & Update Dashboard</button>
+
+<script>
+function loadData() {
+  fetch("data.json")
+    .then(res => res.json())
+    .then(base => {
+      const overrides = JSON.parse(localStorage.getItem("logicraftData")) || {};
+
+      const merged = {
+        logisticsCost: overrides.logisticsCost || base.logisticsCost,
+        spoilageLoss: overrides.spoilageLoss || base.spoilageLoss,
+        deliveryTime: overrides.deliveryTime || base.deliveryTime,
+        comparison: overrides.comparison || base.comparison
+      };
+
+      populateSimple("logisticsTable", merged.logisticsCost);
+      populateSimple("spoilageTable", merged.spoilageLoss);
+      populateSimple("deliveryTable", merged.deliveryTime);
+      populateComparison(merged.comparison);
+    });
+}
+
+function populateSimple(tableId, section) {
+  const t = document.getElementById(tableId);
+  t.innerHTML = "<tr><th>Label</th><th>Value</th></tr>";
+
+  section.labels.forEach((l, i) => {
+    t.innerHTML += `
+      <tr>
+        <td><input value="${l}"></td>
+        <td><input type="number" step="0.1" value="${section.values[i]}"></td>
+      </tr>
+    `;
+  });
+}
+
+function populateComparison(rows) {
+  const t = document.getElementById("comparisonTable");
+  t.innerHTML = `
+    <tr>
+      <th>KPI</th>
+      <th>NCORE</th>
+      <th>LOGICRAFT + ONDC</th>
+    </tr>
+  `;
+
+  rows.forEach(r => {
+    t.innerHTML += `
+      <tr>
+        <td><input value="${r.metric}"></td>
+        <td><input value="${r.traditional}"></td>
+        <td><input value="${r.logicraft}"></td>
+      </tr>
+    `;
+  });
+}
+
+function addRow(tableId) {
+  document.getElementById(tableId).innerHTML += `
+    <tr>
+      <td><input></td>
+      <td><input type="number" step="0.1"></td>
+    </tr>
+  `;
+}
+
+function addComparisonRow() {
+  document.getElementById("comparisonTable").innerHTML += `
+    <tr>
+      <td><input></td>
+      <td><input></td>
+      <td><input></td>
+    </tr>
+  `;
+}
+
+function extractSimple(tableId) {
+  const rows = [...document.getElementById(tableId).rows].slice(1);
+  return {
+    labels: rows.map(r => r.cells[0].children[0].value),
+    values: rows.map(r => Number(r.cells[1].children[0].value))
+  };
+}
+
+function extractComparison() {
+  const rows = [...document.getElementById("comparisonTable").rows].slice(1);
+  return rows.map(r => ({
+    metric: r.cells[0].children[0].value,
+    traditional: r.cells[1].children[0].value,
+    logicraft: r.cells[2].children[0].value
+  }));
+}
+
+function saveAll() {
+  const data = {
+    logisticsCost: extractSimple("logisticsTable"),
+    spoilageLoss: extractSimple("spoilageTable"),
+    deliveryTime: extractSimple("deliveryTable"),
+    comparison: extractComparison()
+  };
+
+  localStorage.setItem("logicraftData", JSON.stringify(data));
+  alert("All values saved. Dashboard updated.");
+}
+</script>
+
+</body>
+</html>

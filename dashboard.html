@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>LOGICRAFT Pilot Dashboard</title>
+
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+<script src="nav.js"></script>
+<script>checkAuth();</script>
+
+<h2>LOGICRAFT Seafood Logistics – Pilot Dashboard</h2>
+
+<!-- KPI CARDS (STATIC TEXT – AUDIT SAFE) -->
+<div class="kpis">
+  <div class="kpi"><h1>20–25%</h1><p>Cost Reduction</p></div>
+  <div class="kpi"><h1>6–8%</h1><p>Spoilage Loss</p></div>
+  <div class="kpi"><h1>3–4 days</h1><p>Avg Delivery Time</p></div>
+  <div class="kpi"><h1>~200</h1><p>MSMEs in Pilot</p></div>
+</div>
+
+<!-- CHARTS -->
+<div class="charts">
+  <div class="chart-box"><canvas id="logisticsChart"></canvas></div>
+  <div class="chart-box"><canvas id="spoilageChart"></canvas></div>
+  <div class="chart-box"><canvas id="deliveryChart"></canvas></div>
+</div>
+
+<!-- COMPARISON TABLE -->
+<div class="table-box">
+  <h3>NCORE vs LOGICRAFT + ONDC (Pilot Actuals)</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>KPI</th>
+        <th>NCORE System</th>
+        <th>LOGICRAFT + ONDC</th>
+      </tr>
+    </thead>
+    <tbody id="comparisonBody"></tbody>
+  </table>
+</div>
+
+<script>
+fetch("data.json")
+  .then(res => res.json())
+  .then(base => {
+
+    const overrides = JSON.parse(localStorage.getItem("logicraftData")) || {};
+
+    const data = {
+      logisticsCost: overrides.logisticsCost || base.logisticsCost,
+      spoilageLoss: overrides.spoilageLoss || base.spoilageLoss,
+      deliveryTime: overrides.deliveryTime || base.deliveryTime,
+      comparison: overrides.comparison || base.comparison
+    };
+
+    new Chart(document.getElementById("logisticsChart"), {
+      type: "bar",
+      data: {
+        labels: data.logisticsCost.labels,
+        datasets: [{
+          label: "Logistics Cost (%)",
+          data: data.logisticsCost.values
+        }]
+      },
+      options: { maintainAspectRatio: false }
+    });
+
+    new Chart(document.getElementById("spoilageChart"), {
+      type: "bar",
+      data: {
+        labels: data.spoilageLoss.labels,
+        datasets: [{
+          label: "Spoilage Loss (%)",
+          data: data.spoilageLoss.values
+        }]
+      },
+      options: { maintainAspectRatio: false }
+    });
+
+    new Chart(document.getElementById("deliveryChart"), {
+      type: "line",
+      data: {
+        labels: data.deliveryTime.labels,
+        datasets: [{
+          label: "Avg Delivery Time (Days)",
+          data: data.deliveryTime.values,
+          tension: 0.3
+        }]
+      },
+      options: { maintainAspectRatio: false }
+    });
+
+    const tbody = document.getElementById("comparisonBody");
+    data.comparison.forEach(r => {
+      tbody.innerHTML += `
+        <tr>
+          <td>${r.metric}</td>
+          <td>${r.traditional}</td>
+          <td style="color:#1f4fd8;font-weight:bold;">${r.logicraft}</td>
+        </tr>
+      `;
+    });
+  });
+</script>
+
+</body>
+</html>

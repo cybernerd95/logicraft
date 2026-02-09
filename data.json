@@ -1,0 +1,20 @@
+{
+  "kpis": {
+    "costReduction": "15–20%",
+    "spoilage": "8–10%",
+    "deliveryTime": "3–4 days",
+    "msmes": "~200"
+  },
+  "logisticsCost": {
+    "labels": ["Small MSMEs", "Medium MSMEs", "Exporters", "LOGICRAFT (Pilot)"],
+    "values": [17, 15, 13, 12]
+  },
+  "spoilageLoss": {
+    "labels": ["No Cold Chain", "Ice-based", "Partial Cold Chain", "Improved Cold Chain"],
+    "values": [25, 18, 12, 9]
+  },
+  "deliveryTime": {
+    "labels": ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5"],
+    "values": [6.5, 6.2, 5.8, 4.8, 4.0]
+  }
+}
