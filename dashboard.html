@@ -72,7 +72,7 @@ fetch("data.json")
     });
 
     new Chart(document.getElementById("spoilageChart"), {
-      type: "bar",
+      type: "pie",
       data: {
         labels: data.spoilageLoss.labels,
         datasets: [{
@@ -80,8 +80,16 @@ fetch("data.json")
           data: data.spoilageLoss.values
         }]
       },
-      options: { maintainAspectRatio: false }
+      options: {
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: "bottom"
+          }
+        }
+      }
     });
+
 
     new Chart(document.getElementById("deliveryChart"), {
       type: "line",
